@@ -1,0 +1,13 @@
+.verse-trope-syntax {font-style: italic; font-weight: bold;}
+.verse-trope {font-style: italic; border: 1px solid red;}
+.verse-syntax {font-weight: bold; border: 1px solid red;}
+.branch-end {color: red;}
+.branch-start {color: blue;}
+.syntax-part {color: green;}
+.branch-end:hover, .branch-start:hover { text-shadow: 0 0 4px gold; color: gold; }
+.highlight { background-color: lightblue; }
+
+table {border: 1px solid black; border-collapse: collapse; table-layout: fixed; }
+td {border: 1px solid black; padding: 5px; text-align: right;}
+.mismatch_data {margin-bottom: 10px; font-weight: bold;}
+
