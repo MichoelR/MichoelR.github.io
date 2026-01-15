@@ -1,0 +1,25 @@
+	.selected {background-color:#FDFD96;} // light pastel yellow
+	.unselected {background-color:transparent;}
+
+	:focus#phrase{outline-width:2px; outline-color:black;}
+	:hover#phrase {outline-width:2px; outline-color:black;outline-style:solid;}
+	
+	.selected .phraseselected {outline-width:2px; outline-color:black;outline-style:solid;}
+	.selected .phraseselected.main {background-color:#FDC68A;} /* pastel yellow-orange */
+	.selected .no-to {background-color:#C4DF9B;} /* pastel pea-green */
+	.selected .phraseselected.no-to {background-color:#A2D39C;} /* pastel yellow-green */
+	.selected .alt {background-color:#B19CD9;} /* light-pastel-purple */
+	.selected .phraseselected.alt {background-color:#A187BE;} /* pastel violet */
+	#main1{overflow:none;}
+	
+	#hblock1,#hblock2,#comments {
+		overflow:auto;
+	}
+	h2 {height:30px;margin 15px;}
+	#hblock1 {height:45px;}
+	#hblock2 {height:400px;}
+	#comments {height:50px;}
+	
+	#topheader {float:left;margin:7px;}
+	#background-button {float:right;clear:right;width:100px;height:40px;}
+	
