@@ -1,0 +1,528 @@
+/*css styles for FourGates*/
+
+h1 {
+  margin-left: 250px;
+}
+
+.yrspan {
+  margin-left: 250px;
+  font-size:50%;
+}
+
+.oidiv ol, li {
+  /* Removing the default list counters/days: */
+  list-style-type: none;
+}
+
+.oidiv ol {
+  /* Resetting the counter so every <ol>
+     has an independent count: */
+  counter-reset: day -1 /* Resets both counters */
+}
+
+.oidiv li {
+  /* 'Real world' measurements are perhaps not
+     entirely faithful on screen: */
+  height: 1.5px;
+  border-top: 1px solid #000;
+  /* Including the border in the height of the element: */
+  box-sizing: border-box;
+  width: 1em;
+  /* Incrementing the counter: */
+  /*counter-increment: sixhr;/* /* Incrementing the sixhr counter */
+  /* To position the counter relative to the <li>: */
+  position: relative;
+  border-left: 2px solid #000;
+}
+
+.oidiv li:nth-child(24n+1) { /* initialize hour counter */
+  counter-reset: sixhr -6;
+}
+
+.oidiv li:nth-child(6n-5) {
+  /* Longer mark for every sixth tick: */
+  counter-increment: sixhr 6;
+  width: 1.5em;
+}
+
+.oidiv li:nth-child(24n-23) {
+  /* Even longer mark for every twenty-fourth tick: */
+  width: 3em;
+  counter-increment: day sixhr 6; /* Incrementing the day counter */
+}
+
+/* Preventing a 'tail' on the <ol> from the
+   height of the last <li> (the counter is
+   displayed at the top, not the bottom): */
+.oidiv li:last-child {
+  height: 0;
+}
+
+.oidiv li:nth-child(6n-5)::after {
+  /* Positioning the pseudo-element that
+     contains the sixhr counter: */
+  position: absolute;
+  /* Vertically-centering it alongside the
+     top border: */
+  top: -0.5em;
+  /* Moving it the full width of the element,
+     outside of the right side of the element: */
+  left: 100%;
+  height: 1em;
+  line-height: 1em;
+  width: 2em;
+  text-align: center;
+  font-size: 40%;
+  /* Specifying the counter to use: */
+  content: counter(sixhr) "h"; /* Displaying the sixhr counter */
+}
+
+.oidiv li:nth-child(24n-23)::after {
+  /* Positioning the pseudo-element that
+     contains the day counter: */
+  position: absolute;
+  /* Vertically-centering it alongside the
+     top border: */
+  top: -0.5em;
+  /* Moving it the full width of the element,
+     outside of the right side of the element: */
+  left: 100%;
+  height: 1em;
+  line-height: 1em;
+  width: 2em;
+  text-align: center;
+  font-size: 70%;
+  /* Specifying the counter to use: */
+  content: counter(day) "d"; /* Displaying the day counter */
+}
+
+.oidiv .li18h {
+  color: darkorange;
+  border-color: darkorange;
+}
+
+.vl {
+  position: relative;
+  width:1px;
+  height:10px;
+  margin-left: 20px;
+  background-color: black;
+}
+
+.container { /* holds all rulers and the chart */
+  position: relative;
+  display: flex;
+  margin-top: 0;
+  margin-left:10px;
+  /*overflow: scroll;*/
+}
+
+.ruler {
+  position: relative;
+  margin-bottom: 0;
+  /*margin-top: 70px;*/
+  margin-top: 30px;
+  background-color: white;
+}
+
+.ruler1 {
+  z-index: 3;
+
+}
+.ruler2 {
+  margin-top: 30px;
+}
+
+.yrLen {
+  position: absolute;
+  top: -42px;
+  left: -50px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.year {
+  position: absolute;
+  top: -25px;
+}
+
+.year2 {
+  color: lawngreen;
+  font-weight: bold;
+}
+
+.oidiv {
+  display: inline-block;
+  width: 80px;
+  margin-left: 10px;
+}
+
+.ruleroi {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 0;
+  margin-block-start: 0;
+  padding: 0;
+  padding-inline-start: 0;
+  width: 40px;
+}
+
+.topOfRule {
+  color: gray;
+  border-color: lightgray;
+}
+
+.ptr {
+  position: absolute;
+  left: -2px;
+  margin: 1px 0 0 0;
+  padding: 0;
+  line-height: 0px;
+}
+.ptr span {
+  position: absolute;
+}
+
+#ptr_2 {
+  color: lawngreen;
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+  background: transparent;
+  z-index: 2; /* so it can be dragged even if the RH days are there too */
+}
+
+.RH {
+  position: absolute;
+  color: blue;
+  left: -8.5px;
+  border-right: 2px solid blue;
+  height: 38px;
+  padding: 0;
+  display: none; /* initially */
+  z-index: 1; /* stay under the pointer */
+}
+
+.RH div {
+  margin-right: 1px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 60%;
+}
+
+.RH_fnl { /* concluding result for RH-day */
+  margin-left: 0;
+  padding-right: 0;
+  border-right-width: 3px;
+  border-color: blue;
+  color: blue;
+}
+
+.RH_nof1 { /* earlier RH-day, just before 0 */
+  border-color: lightgreen;
+  color: lightgreen;
+}
+
+.RH_nof2 { /* earlier RH-day, just before 1 */
+  border-color: red;
+  color: red;
+}
+
+.RH_nofnl { /* any earlier RH-day */
+  margin-left: 4px;
+  padding-right: 2.5px;
+  border-right-width: 1.5px;
+}
+
+.RH_Shb { /* earlier RH-day, if it's on Shabbos (need more room) */
+  padding-right: 1px;
+}
+
+.RH2 { /* text of day-of-week */
+  line-height: .6em;
+  padding: 2px;
+}
+
+.RH2fnl { /* circle the final RH result */
+  border: blue solid 1px;
+}
+
+/* removed for now; I don't think it's an improvement*/
+/*.story0 { /* markers within "story" text */
+  padding-right: 2px;
+  border-right: blue solid 3px;
+  color: blue;
+}*/ 
+
+/*.story1 {
+  padding-right: 2px;
+  border-right: lightgreen solid 1.5px;
+  color: lightgreen;
+}*/
+
+/*.story2 {
+  padding-right: 2px;
+  border-right: red solid 1.5px;
+  color: red;
+}*/
+
+.moladCtr {
+  width: 95%;
+  text-align: center;
+  margin-top: 5px;
+  border: 1px solid blue;
+  color: blue;
+  font-size: 14px;
+}
+
+#molad_1.moladCtr {
+  position: absolute;
+}
+#molad_3.moladCtr {
+  position: absolute;
+}
+
+.moladCtrI {
+  position: absolute;
+  left: -15px;
+  width: 120px;
+  text-align: left;
+  margin-top: 5px;
+  border: 2px solid lawngreen;
+  color: black;
+}
+.moladCI {
+  font-size: 14px;
+  padding: 0;
+}
+.moladCtrI1 {
+  width: 25px;
+  border: none;
+}
+.moladCtrI2 {
+  width: 30px;
+  border: none;
+}
+.moladCtrI3 {
+  width: 50px;
+  border: none;
+}
+
+.harrowdiv {
+  position: absolute;
+  left: 230px;
+  top: 30px;
+  margin: 0 0 0 0;
+  padding: 0;
+}
+
+.harrow {
+  position: relative;
+  width: 450px;
+  height: 2px;
+  border-top: 2px solid red;
+  z-index: 2;
+}
+.harrow::after {
+  position: absolute;
+  content: '';
+  height; 0;
+  width: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 10px solid red;
+  right: -10px;
+  top: -6px;
+}
+
+.varrowdiv {
+  position: absolute;
+  left: 285px;
+  top: 10px;
+  margin: 0;
+  padding: 0;  
+}
+
+.varrow {
+  position: relative;
+  width: 0;
+  height: 250px;
+  border-left: 2px solid green;
+  z-index: 2;
+}
+.varrow::after {
+  position: absolute;
+  content: '';
+  height; 0;
+  width: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 10px solid green;
+  right: -4px;
+  top: 100%;
+}
+
+#fourgatesdiv {
+  position: absolute;
+  left: 380px;
+  top: 60px;
+  width: 550px;
+  display: inline;
+  white-space: nowrap;
+  z-index: 1;
+}
+#fourGates tr {
+}
+#fourGates th {
+  background-color: #F4F4F4;
+  text-align: center;
+  border: 1px solid #B0B0B0;
+}
+#fourGates td {
+  position: relative;
+  background-color: #FAFAFA;
+  text-align: center;
+  border: 1px solid #707070;
+}
+#fourGates .topGap {
+  padding: 3px 0;
+  border: 1px #707070;
+  border-style: solid hidden hidden hidden;
+}
+#fourGates tr.topGapTR th {
+  background-color: white;
+}
+#fourGates .moladCol {
+  position: relative;
+  border: none;
+  background-color: white;
+}
+#fourGates .moladCol2 {
+  border: 1px;
+  border-color: black;
+  width: 25px;
+  border-style: solid solid solid hidden;
+  background-color: white;
+}
+#fourGates .moladDiv {
+  position: absolute;
+  right: 5px;
+  top: -7px;
+  overflow: visible;
+  white-space: nowrap;
+  font-size:13px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+#fourGates .moladDiv:hover {
+  background-color: lightgray;
+  transform: translateY(-1px);
+  border: 1px solid black;
+  /*font-weight: bold;*/
+}
+#fourGates .moladDivUp { /* one of them, moved up slightly */
+  top: -10px;
+}
+#fourGates .moladDivDown { /* one of them, moved down slightly */
+  top: -4px;
+}
+#fourGates th .lgTxt {
+  font-size:135%;
+}
+#fourGates td .lgTxt {
+  position: absolute;
+  font-size:125%;
+  /*top: 0;*/
+  top: -5px;
+  padding:3px 5px;
+  border: 2px blue; /* not visible initially */
+}
+#fourGates td .lgTxt.showBrd {
+  border-style: solid;
+  z-index: 2;
+}
+#fourGates td .txtUp {
+  /*top: -7.5px;*/
+  /*top: -14.5px;*/
+  transform: translateY(-4px);
+}
+#fourGates td .txtDown {
+  transform: translateY(15px);
+}
+
+#fourGates .yearType {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+#fourGates th.yearType:hover {
+  background-color: lightgray;
+  transform: translateY(-1px);
+}
+
+.storydiv{
+  position: relative;
+  display: block;
+  height: 60px;
+  width: 100%;
+  border: 1px solid black;
+  margin-top: 40px;
+  padding-left: 5px;
+  background-color: lightcyan;
+}
+#storyMolad {
+  font-weight: bold;
+}
+#showCol {
+  position:relative;
+  border: 2px solid darkblue;
+  background-color: gold;
+  padding-top: 1px;
+}
+
+@keyframes flash1 {
+ 0% { background-color: white; opacity:100%;}
+ 50% { background-color: yellow; }
+ 100% { background-color: white; opacity:100%;}
+}
+.flash1{
+	animation-name: flash1;
+	animation-duration: 1s;
+	animation-iteration-count: 1;
+}
+
+.flash2::before { /* only there when addClass */
+	position: absolute;
+    content: "";
+    display: inline-block;
+	top: -2px;
+	left: -2px;
+    width: 24px; /* Adjust as needed */
+    height: 4px; /* Takes full height of the li */
+    background-color: transparent;
+    animation: flash2 3s ; /* Adjust animation duration as needed */
+  }
+@keyframes flash2 {
+ 0% { background-color: white; opacity:100%;}
+ 25% { background-color: yellow; }
+ 50% { background-color: orange; }
+ 75% { background-color: yellow; }
+ 100% { background-color: white; opacity:100%;}
+}
+.flash2{
+	animation-name: flash2;
+	animation-duration: 1s;
+	animation-iteration-count: 3;
+}
+
+@keyframes flash3 {
+ 0% { color: blue; transform: translateY(-1px);}
+ 25% { color: blue; transform: translateY(0px);}
+ 50% { color: blue; transform: translateY(1px);}
+ 75% { color: blue; transform: translateY(0px);}
+ 100% { color: blue; transform: translateY(-1px);}
+}
+.flash3{
+	animation-name: flash3;
+	animation-duration: 1s;
+	animation-iteration-count: 3;
+}
