@@ -7,7 +7,7 @@
 .branch-end:hover, .branch-start:hover { text-shadow: 0 0 4px gold; color: gold; }
 .highlight { background-color: lightblue; }
 
-table {border: 1px solid black; border-collapse: collapse; table-layout: fixed; }
-td {border: 1px solid black; padding: 5px; text-align: right;}
+table {border: 1px solid black; border-collapse: collapse; table-layout: auto; }
+td {border: 1px solid black; padding: 5px; text-align: right; white-space: nowrap;}
 .mismatch_data {margin-bottom: 10px; font-weight: bold;}
 
