@@ -1,13 +1,25 @@
-.verse-trope-syntax {font-style: italic; font-weight: bold;}
-.verse-trope {font-style: italic; border: 1px solid red;}
-.verse-syntax {font-weight: bold; border: 1px solid red;}
-.branch-end {color: red;}
-.branch-start {color: blue;}
+.verse-trop-syntax {font-style: italic; font-weight: bold;}
+.verse-trop, .verse-syntax { cursor: pointer; }
+.verse-trop {font-style: italic; }
+.verse-syntax {font-weight: bold; }
+.branch-end {color: red; padding: 0 2px; cursor: pointer;}
+.branch-start {color: blue; padding: 0 2px; cursor: pointer;}
 .syntax-part {color: green;}
 .branch-end:hover, .branch-start:hover { text-shadow: 0 0 4px gold; color: gold; }
-.highlight { background-color: lightblue; }
+.highlight-trop-dim { background-color: gold; border: 1px solid black; opacity: 0.5; }
+.highlight-trop-bright { background-color: gold; border: 1px solid black; opacity: 1; }
+.highlight-syntax-dim { background-color: lightblue; border: 1px solid black; opacity: 0.5; }
+.highlight-syntax-bright { background-color: lightblue; border: 1px solid black; opacity: 1; }
+.highlight-trop-dim.highlight-syntax-dim,
+.highlight-trop-bright.highlight-syntax-dim,
+.highlight-trop-dim.highlight-syntax-bright,
+.highlight-trop-bright.highlight-syntax-bright { background-color: #dda0dd; border: 1px solid black; opacity: 0.7; }
+
+
 
 table {border: 1px solid black; border-collapse: collapse; table-layout: auto; }
-td {border: 1px solid black; padding: 5px; text-align: right; white-space: nowrap;}
+td {border: 1px solid black; padding: 5px; text-align: right; white-space: nowrap; 
+	transition: background-color 0.3s ease, border 0.3s ease;
+}
 .mismatch_data {margin-bottom: 10px; font-weight: bold;}
 
