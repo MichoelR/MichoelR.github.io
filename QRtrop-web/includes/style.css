@@ -2,10 +2,10 @@
 .verse-trop, .verse-syntax { cursor: pointer; }
 .verse-trop {font-style: italic; }
 .verse-syntax {font-weight: bold; }
-.branch-end {color: red; padding: 0 2px; cursor: pointer;}
-.branch-start {color: blue; padding: 0 2px; cursor: pointer;}
+.branch-end {color: red; padding: 5px 2px; margin: -5px 0; cursor: pointer; display: inline-block;}
+.branch-start {color: blue; padding: 5px 2px; margin: -5px 0; cursor: pointer; display: inline-block;}
 .syntax-part {color: green;}
-.branch-end:hover, .branch-start:hover { text-shadow: 0 0 4px gold; color: gold; }
+
 .highlight-trop-dim { background-color: gold; border: 1px solid black; opacity: 0.5; }
 .highlight-trop-bright { background-color: gold; border: 1px solid black; opacity: 1; }
 .highlight-syntax-dim { background-color: lightblue; border: 1px solid black; opacity: 0.5; }
@@ -14,6 +14,8 @@
 .highlight-trop-bright.highlight-syntax-dim,
 .highlight-trop-dim.highlight-syntax-bright,
 .highlight-trop-bright.highlight-syntax-bright { background-color: #dda0dd; border: 1px solid black; opacity: 0.7; }
+.highlight-pair-trop { background-color: gold !important; color: black; }
+.highlight-pair-syntax { background-color: lightblue !important; color: black; }
 
 
 

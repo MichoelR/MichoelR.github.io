@@ -29,6 +29,13 @@ document.addEventListener('DOMContentLoaded', function() {
           }
         }
       }
+      // Highlight paired paren
+      const pairClass = isTrope ? 'highlight-pair-trop' : 'highlight-pair-syntax';
+      const pairId = id.replace(/-L$|-R$/, '');
+      const pairDirection = id.endsWith('-L') ? '-R' : '-L';
+      const pairedSpan = document.getElementById(pairId + pairDirection);
+      this.classList.add(pairClass);
+      if (pairedSpan) pairedSpan.classList.add(pairClass);
     });
     span.addEventListener('mouseout', function() {
       const id = this.id;
@@ -52,6 +59,13 @@ document.addEventListener('DOMContentLoaded', function() {
           }
         }
       }
+      // Remove highlight from paired paren
+      const pairClass = isTrope ? 'highlight-pair-trop' : 'highlight-pair-syntax';
+      const pairId = id.replace(/-L$|-R$/, '');
+      const pairDirection = id.endsWith('-L') ? '-R' : '-L';
+      const pairedSpan = document.getElementById(pairId + pairDirection);
+      this.classList.remove(pairClass);
+      if (pairedSpan) pairedSpan.classList.remove(pairClass);
     });
   });
 
