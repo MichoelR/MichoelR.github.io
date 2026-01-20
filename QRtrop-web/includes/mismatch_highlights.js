@@ -15,13 +15,31 @@ document.addEventListener('DOMContentLoaded', function() {
             td.classList.add(isTrope ? 'highlight-trop-bright' : 'highlight-syntax-bright');
           }
         }
+        // Highlight matching bracket
+        const dirIndex = isTrope ? 6 : 8;
+        const direction = parts[dirIndex];
+        const pairDirection = direction === 'L' ? 'R' : 'L';
+        const pairParts = [...parts];
+        pairParts[dirIndex] = pairDirection;
+        const pairId = pairParts.join('-');
+        const pairSpan = document.getElementById(pairId);
+        if (pairSpan) {
+          pairSpan.classList.add('highlight-pair');
+        }
+        span.classList.add('highlight-pair');
+        // Highlight associated trop text
+        const td = span.closest('td');
+        const tropSpan = td ? td.querySelector('.verse-trop') : null;
+        if (tropSpan) {
+          tropSpan.classList.add('highlight-pair');
+        }
         // Handle overlaps
         const overlappingWords = new Set();
         document.querySelectorAll('.highlight-trop-bright.highlight-syntax-bright').forEach(td => {
           overlappingWords.add(td.dataset.word);
         });
         overlappingWords.forEach(word => {
-          const td = table.querySelector(`td[data-word="${word}"]`);
+          const td = table.querySelector('td[data-word="' + word + '"]');
           if (td) {
             td.classList.remove('highlight-trop-bright', 'highlight-syntax-bright');
             td.classList.add('highlight-overlap');
@@ -44,6 +62,24 @@ document.addEventListener('DOMContentLoaded', function() {
             td.classList.remove(isTrope ? 'highlight-trop-bright' : 'highlight-syntax-bright', 'highlight-overlap');
           }
         }
+        // Remove highlight from matching bracket
+        const dirIndex = isTrope ? 6 : 8;
+        const direction = parts[dirIndex];
+        const pairDirection = direction === 'L' ? 'R' : 'L';
+        const pairParts = [...parts];
+        pairParts[dirIndex] = pairDirection;
+        const pairId = pairParts.join('-');
+        const pairSpan = document.getElementById(pairId);
+        if (pairSpan) {
+          pairSpan.classList.remove('highlight-pair');
+        }
+        span.classList.remove('highlight-pair');
+        // Remove highlight from associated trop text
+        const td = span.closest('td');
+        const tropSpan = td ? td.querySelector('.verse-trop') : null;
+        if (tropSpan) {
+          tropSpan.classList.remove('highlight-pair');
+        }
       }
     });
   });
@@ -58,18 +94,19 @@ document.addEventListener('DOMContentLoaded', function() {
       const [syntaxStart, syntaxEnd] = syntaxSpan.dataset.words.split('-').map(Number);
       const table = mismatchDiv.nextElementSibling;
       if (table) {
-        // Highlight trope dim
-        for (let w = tropStart; w <= tropEnd; w++) {
-          const td = table.querySelector(`td[data-word="${w}"]`);
-          if (td) {
-            td.classList.add('highlight-trop-dim');
+        if (!this.closest('td')) {
+          // For mismatch_data verse-trop, highlight trop dim and syntax bright
+          for (let w = tropStart; w <= tropEnd; w++) {
+            const td = table.querySelector(`td[data-word="${w}"]`);
+            if (td) {
+              td.classList.add('highlight-trop-dim');
+            }
           }
-        }
-        // Highlight syntax bright
-        for (let w = syntaxStart; w <= syntaxEnd; w++) {
-          const td = table.querySelector(`td[data-word="${w}"]`);
-          if (td) {
-            td.classList.add('highlight-syntax-bright');
+          for (let w = syntaxStart; w <= syntaxEnd; w++) {
+            const td = table.querySelector(`td[data-word="${w}"]`);
+            if (td) {
+              td.classList.add('highlight-syntax-bright');
+            }
           }
         }
         // Handle overlaps
@@ -109,6 +146,7 @@ document.addEventListener('DOMContentLoaded', function() {
             td.classList.remove('highlight-syntax-bright', 'highlight-syntax-dim');
           }
         }
+
       }
     });
   });
@@ -140,7 +178,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (tropCells.length) {
           const startCol = cells.indexOf(tropCells[0]) + 1;
           const endCol = cells.indexOf(tropCells[tropCells.length - 1]) + 1;
-          highlightCellRange(table, 1, startCol, 1, endCol, 4, 1); // borderPx=4 for trope
+          highlightCellRange(table, 1, startCol, 1, endCol, 4, 1.5); // borderPx=4 for trope
         }
 
         // For syntax
@@ -151,7 +189,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (syntaxCells.length) {
           const startCol = cells.indexOf(syntaxCells[0]) + 1;
           const endCol = cells.indexOf(syntaxCells[syntaxCells.length - 1]) + 1;
-          highlightCellRange(table, 1, startCol, 1, endCol, -4, 1); // borderPx=-4 for syntax
+          highlightCellRange(table, 1, startCol, 1, endCol, -4, 1.5); // borderPx=-4 for syntax
         }
 
         observer.unobserve(table);
@@ -167,8 +205,8 @@ document.addEventListener('DOMContentLoaded', function() {
 function highlightCellRange(table, startRow = 1, startCol, endRow = 1, endCol, borderPx = 3, borderThickPx = 1) {
   const rect = table.getBoundingClientRect();
   const rowStarts = Array.from(table.rows).slice(startRow - 1, endRow);
-  const firstCell = rowStarts[0]?.cells[startCol - 1];
-  const lastCell = rowStarts[rowStarts.length - 1]?.cells[endCol - 1];
+  const firstCell = rowStarts[0] && rowStarts[0].cells[startCol - 1];
+  const lastCell = rowStarts[rowStarts.length - 1] && rowStarts[rowStarts.length - 1].cells[endCol - 1];
   
   if (!firstCell || !lastCell) return;
   
@@ -182,17 +220,7 @@ function highlightCellRange(table, startRow = 1, startCol, endRow = 1, endCol, b
   
   const highlight = document.createElement('div');
   highlight.className = 'cell-highlight';
-  highlight.style.cssText = `
-    position: absolute;
-    top: ${top}px;
-    left: ${left}px;
-    width: ${width}px;
-    height: ${height}px;
-    border: ${borderThickPx}px solid red;
-    pointer-events: none;
-    z-index: 100;
-    box-sizing: border-box;
-  `;
+  highlight.style.cssText = `position: absolute; top: ${top}px; left: ${left}px; width: ${width}px; height: ${height}px; border: ${borderThickPx}px solid red; pointer-events: none; z-index: 100; box-sizing: border-box;`;
   
   table.style.position = 'relative';
   table.style.overflow = 'visible';

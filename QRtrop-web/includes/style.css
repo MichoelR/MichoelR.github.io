@@ -2,9 +2,19 @@
 .verse-trop, .verse-syntax { cursor: pointer; }
 .verse-trop {font-style: italic; }
 .verse-syntax {font-weight: bold; }
-.branch-end {color: red; padding: 5px 2px; margin: -5px 0; margin-right: 0.2em; cursor: pointer; display: inline-block;}
-.branch-start {color: blue; padding: 5px 2px; margin: -5px 0; margin-right: 0.2em; cursor: pointer; display: inline-block;}
+.branch-end, .branch-start {padding: 5px 2px; margin: -5px 0; margin-right: 0.2em; cursor: pointer; display: inline-block;}
+
 .syntax-part {color: green; margin-right: 0.2em;}
+.trop-level-1 { color: #1f77b4; }
+.trop-level-2 { color: #ff7f0e; }
+.trop-level-3 { color: #2ca02c; }
+.trop-level-4 { color: #d62728; }
+.syntax-level-1 { color: #9467bd; }
+.syntax-level-2 { color: #8c564b; }
+.syntax-level-3 { color: #e377c2; }
+.syntax-level-4 { color: #7f7f7f; }
+.mismatch-pair { font-size: 1.2em; font-weight: bold; }
+.highlight-pair { background-color: yellow; }
 
 .highlight-trop-dim { background-color: gold; border: 1px solid black; opacity: 0.5; }
 .highlight-trop-bright { background-color: gold; border: 1px solid black; opacity: 1; }
