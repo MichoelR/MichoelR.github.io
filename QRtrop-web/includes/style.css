@@ -1,6 +1,7 @@
 .verse-trop-syntax {font-style: italic; font-weight: bold;}
 .verse-trop, .verse-syntax { cursor: pointer; }
 .verse-trop {font-style: italic; }
+tr:nth-child(2) .verse-trop { display: inline-block; height: 100%; padding: 5px 2px; margin: -5px 0; margin-right: 0.2em; }
 .verse-syntax {font-weight: bold; }
 .branch-end, .branch-start {padding: 5px 2px; margin: -5px 0; margin-right: 0.2em; cursor: pointer; display: inline-block;}
 
