@@ -21,6 +21,7 @@ tr:nth-child(2) .verse-trop { display: inline-block; height: 100%; padding: 5px 
 .highlight-trop-bright { background-color: gold; border: 1px solid black; opacity: 1; }
 .highlight-syntax-dim { background-color: lightblue; border: 1px solid black; opacity: 0.5; }
 .highlight-syntax-bright { background-color: lightblue; border: 1px solid black; opacity: 1; }
+.highlight-overlap { background-color: rgba(221, 160, 221, 0.5); border: 1px solid black; }
 .highlight-trop-dim.highlight-syntax-dim,
 .highlight-trop-bright.highlight-syntax-dim,
 .highlight-trop-dim.highlight-syntax-bright,

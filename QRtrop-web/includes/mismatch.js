@@ -135,32 +135,37 @@ document.addEventListener('DOMContentLoaded', function() {
       const table = mismatchDiv.nextElementSibling;
       if (table) {
         if (!this.closest('td')) {
-          // For mismatch_data verse-trop, highlight trop dim and syntax bright
-          for (let w = tropStart; w <= tropEnd; w++) {
-            const td = table.querySelector(`td[data-word="${w}"]`);
-            if (td) {
-              td.classList.add('highlight-trop-dim');
-            }
+          // Compute overlap words
+          const overlapWords = new Set();
+          for (let w = Math.max(tropStart, syntaxStart); w <= Math.min(tropEnd, syntaxEnd); w++) {
+            overlapWords.add(w);
           }
-          for (let w = syntaxStart; w <= syntaxEnd; w++) {
-            const td = table.querySelector(`td[data-word="${w}"]`);
-            if (td) {
-              td.classList.add('highlight-syntax-bright');
+          if (this.classList.contains('verse-trop')) {
+            // Hovering over trop words: highlight trop-only gold, overlap violet
+            for (let w = tropStart; w <= tropEnd; w++) {
+              const td = table.querySelector(`td[data-word="${w}"]`);
+              if (td) {
+                if (overlapWords.has(w)) {
+                  td.classList.add('highlight-overlap');
+                } else {
+                  td.classList.add('highlight-trop-bright');
+                }
+              }
+            }
+          } else if (this.classList.contains('verse-syntax')) {
+            // Hovering over syntax words: highlight syntax-only lightblue, overlap violet
+            for (let w = syntaxStart; w <= syntaxEnd; w++) {
+              const td = table.querySelector(`td[data-word="${w}"]`);
+              if (td) {
+                if (overlapWords.has(w)) {
+                  td.classList.add('highlight-overlap');
+                } else {
+                  td.classList.add('highlight-syntax-bright');
+                }
+              }
             }
           }
         }
-        // Handle overlaps
-        const overlappingWords = new Set();
-        document.querySelectorAll('.highlight-trop-dim.highlight-syntax-bright').forEach(td => {
-          overlappingWords.add(td.dataset.word);
-        });
-        overlappingWords.forEach(word => {
-          const td = table.querySelector(`td[data-word="${word}"]`);
-          if (td) {
-            td.classList.remove('highlight-trop-dim', 'highlight-syntax-bright');
-            td.classList.add('highlight-overlap');
-          }
-        });
       }
     });
     span.addEventListener('mouseout', function() {
@@ -172,21 +177,13 @@ document.addEventListener('DOMContentLoaded', function() {
       const [syntaxStart, syntaxEnd] = syntaxSpan.dataset.words.split('-').map(Number);
       const table = mismatchDiv.nextElementSibling;
       if (table) {
-        // Remove trope highlights
-        for (let w = tropStart; w <= tropEnd; w++) {
+        // Remove all highlights
+        for (let w = Math.min(tropStart, syntaxStart); w <= Math.max(tropEnd, syntaxEnd); w++) {
           const td = table.querySelector(`td[data-word="${w}"]`);
           if (td) {
-            td.classList.remove('highlight-trop-bright', 'highlight-trop-dim');
+            td.classList.remove('highlight-overlap', 'highlight-trop-bright', 'highlight-syntax-bright');
           }
         }
-        // Remove syntax highlights
-        for (let w = syntaxStart; w <= syntaxEnd; w++) {
-          const td = table.querySelector(`td[data-word="${w}"]`);
-          if (td) {
-            td.classList.remove('highlight-syntax-bright', 'highlight-syntax-dim');
-          }
-        }
-
       }
     });
   });
