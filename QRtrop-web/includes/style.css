@@ -35,5 +35,63 @@ table {border: 1px solid black; border-collapse: collapse; table-layout: auto; }
 td {border: 1px solid black; padding: 5px; text-align: right; white-space: nowrap; 
 	transition: background-color 0.3s ease, border 0.3s ease;
 }
-.mismatch_data {margin-bottom: 10px; font-weight: bold;}
+.mismatch_data {
+  margin-bottom: 10px;
+  font-weight: bold;
+  text-align: right;
+  width: 100%;
+}
+
+.verse-container {
+  text-align: right;
+  width: 100%;
+  margin-bottom: 5px;
+  margin-left: auto;
+  margin-right: 0;
+  display: block;
+}
+
+/* Styles for mismatch tables to align right */
+.table-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.segment-table {
+  margin-left: auto;
+  margin-right: 0;
+  position: relative;
+  border-collapse: collapse;
+}
+
+.cell-highlight {
+  position: absolute;
+  pointer-events: none;
+  z-index: 100;
+  box-sizing: border-box;
+}
+
+.cell-highlight-trop {
+  border: 2px solid orange !important;
+}
+
+.cell-highlight-syntax {
+  border: 2px solid blue !important;
+}
+
+.cell-highlight.start {
+  border-left: 0 !important;
+}
+
+.cell-highlight.middle {
+  border-left: 0 !important;
+  border-right: 0 !important;
+}
+
+.cell-highlight.end {
+  border-right: 0 !important;
+}
 
