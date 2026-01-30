@@ -128,15 +128,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
   document.querySelectorAll('.verse-trop, .verse-syntax').forEach(span => {
     span.addEventListener('mouseover', function() {
-      const mismatchDiv = this.closest('.mismatch_data');
+      const mismatchDiv = this.closest('.mismatch-data');
       if (!mismatchDiv) return;
       const tropSpan = mismatchDiv.querySelector('.verse-trop');
       const syntaxSpan = mismatchDiv.querySelector('.verse-syntax');
       if (!tropSpan || !syntaxSpan) return;
       const [tropStart, tropEnd] = tropSpan.dataset.words.split('-').map(Number);
       const [syntaxStart, syntaxEnd] = syntaxSpan.dataset.words.split('-').map(Number);
-      // Find the associated container - it should be the next sibling after the mismatch_data div
-      const container = mismatchDiv.nextElementSibling && mismatchDiv.nextElementSibling.classList.contains('table-container') ? mismatchDiv.nextElementSibling : null;
+      // Find the associated container within the same verse-container
+      const verseContainer = mismatchDiv.closest('.verse-container');
+      if (!verseContainer) return;
+      const container = verseContainer.querySelector('.table-container');
       if (container) {
         if (!this.closest('td')) {
           // Compute overlap words
@@ -173,15 +175,17 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
     span.addEventListener('mouseout', function() {
-      const mismatchDiv = this.closest('.mismatch_data');
+      const mismatchDiv = this.closest('.mismatch-data');
       if (!mismatchDiv) return;
       const tropSpan = mismatchDiv.querySelector('.verse-trop');
       const syntaxSpan = mismatchDiv.querySelector('.verse-syntax');
       if (!tropSpan || !syntaxSpan) return;
       const [tropStart, tropEnd] = tropSpan.dataset.words.split('-').map(Number);
       const [syntaxStart, syntaxEnd] = syntaxSpan.dataset.words.split('-').map(Number);
-      // Find the associated container - it should be the next sibling after the mismatch_data div
-      const container = mismatchDiv.nextElementSibling && mismatchDiv.nextElementSibling.classList.contains('table-container') ? mismatchDiv.nextElementSibling : null;
+      // Find the associated container within the same verse-container
+      const verseContainer = mismatchDiv.closest('.verse-container');
+      if (!verseContainer) return;
+      const container = verseContainer.querySelector('.table-container');
       if (container) {
         // Remove all highlights
         for (let w = Math.min(tropStart, syntaxStart); w <= Math.max(tropEnd, syntaxEnd); w++) {
@@ -294,26 +298,88 @@ document.addEventListener('DOMContentLoaded', function() {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         const container = entry.target;
-        const mismatchDiv = container.previousElementSibling;
-        if (!mismatchDiv) return;
-        if (!mismatchDiv.classList.contains('mismatch_data')) return;
-
-        const tropSpan = mismatchDiv.querySelector('.verse-trop');
-        const syntaxSpan = mismatchDiv.querySelector('.verse-syntax');
-        if (!tropSpan || !syntaxSpan) return;
-        const [tropStart, tropEnd] = tropSpan.dataset.words.split('-').map(Number);
-        const [syntaxStart, syntaxEnd] = syntaxSpan.dataset.words.split('-').map(Number);
+        const verseContainer = container.closest('.verse-container');
+        if (!verseContainer) return;
+        const chap = verseContainer.getAttribute('data-chap');
+        const verse = verseContainer.getAttribute('data-verse');
+        let tropRange, syntaxRange;
+        const selectedRadio = verseContainer.querySelector(`input[name="mismatch-select-${chap}-${verse}"]:checked`);
+        if (selectedRadio) {
+          tropRange = selectedRadio.getAttribute('data-trop').split('-').map(Number);
+          syntaxRange = selectedRadio.getAttribute('data-syntax').split('-').map(Number);
+        } else {
+          // Handle single mismatch case where there is no radio button
+          const mismatchDiv = verseContainer.querySelector('.mismatch-selector .mismatch-data');
+          if (!mismatchDiv) return;
+          const tropSpan = mismatchDiv.querySelector('.verse-trop');
+          const syntaxSpan = mismatchDiv.querySelector('.verse-syntax');
+          if (!tropSpan || !syntaxSpan) return;
+          tropRange = tropSpan.getAttribute('data-words').split('-').map(Number);
+          syntaxRange = syntaxSpan.getAttribute('data-words').split('-').map(Number);
+          // Add colored borders to mismatch-data spans
+          tropSpan.style.border = '1.5px solid orange';
+          tropSpan.style.padding = '6px 2px';
+          tropSpan.style.display = 'inline-block';
+          syntaxSpan.style.border = '1.5px solid blue';
+          syntaxSpan.style.padding = '2px';
+          syntaxSpan.style.display = 'inline-block';
+        }
 
         // Remove any existing highlights in the container to prevent duplicates
-        container.querySelectorAll('.cell-highlight').forEach(h => h.remove());
+        container.querySelectorAll('.cell-highlight-trop, .cell-highlight-syntax').forEach(h => h.remove());
 
         // Highlight trope range across all relevant tables
-        highlightRangeAcrossTables(container, tropStart, tropEnd, 'orange');
-        
-        // Highlight syntax range across all relevant tables
-        highlightRangeAcrossTables(container, syntaxStart, syntaxEnd, 'blue');
+        highlightRangeAcrossTables(container, tropRange[0], tropRange[1], 'orange');
 
-        // Add colored borders to mismatch_data spans to match highlight colors
+
+        // Highlight syntax range across all relevant tables
+        highlightRangeAcrossTables(container, syntaxRange[0], syntaxRange[1], 'blue');
+
+        observer.unobserve(container);
+      }
+    });
+  });
+
+  document.querySelectorAll('.table-container').forEach(container => {
+    observer.observe(container);
+  });
+
+  // Add event listeners to radio buttons to update highlights on change
+  const radioButtons = document.querySelectorAll('input[type="radio"][name^="mismatch-select-"]');
+  radioButtons.forEach(radio => {
+    radio.addEventListener('change', function() {
+      const name = radio.getAttribute('name');
+      const chapVerse = name.split('mismatch-select-')[1].split('-');
+      const chap = chapVerse[0];
+      const verse = chapVerse[1];
+      const verseContainer = document.querySelector(`.verse-container[data-chap="${chap}"][data-verse="${verse}"]`);
+      if (!verseContainer) return;
+      const container = verseContainer.querySelector('.table-container');
+      if (!container) return;
+      const selectedRadio = verseContainer.querySelector(`input[name="mismatch-select-${chap}-${verse}"]:checked`);
+      if (!selectedRadio) return;
+      const tropRange = selectedRadio.getAttribute('data-trop').split('-').map(Number);
+      const syntaxRange = selectedRadio.getAttribute('data-syntax').split('-').map(Number);
+
+      // Remove existing highlights
+      container.querySelectorAll('.cell-highlight-trop, .cell-highlight-syntax').forEach(h => h.remove());
+
+      // Apply new highlights based on selected radio
+      highlightRangeAcrossTables(container, tropRange[0], tropRange[1], 'orange');
+      highlightRangeAcrossTables(container, syntaxRange[0], syntaxRange[1], 'blue');
+
+      // Update borders on mismatch spans
+      const mismatchDivs = verseContainer.querySelectorAll('.mismatch-data');
+      mismatchDivs.forEach(div => {
+        const tropSpan = div.querySelector('.verse-trop');
+        const syntaxSpan = div.querySelector('.verse-syntax');
+        if (tropSpan) tropSpan.style.border = '';
+        if (syntaxSpan) syntaxSpan.style.border = '';
+      });
+      const selectedMismatchDiv = verseContainer.querySelector(`.mismatch-data.mismatch-${selectedRadio.value}`);
+      if (selectedMismatchDiv) {
+        const tropSpan = selectedMismatchDiv.querySelector('.verse-trop');
+        const syntaxSpan = selectedMismatchDiv.querySelector('.verse-syntax');
         if (tropSpan) {
           tropSpan.style.border = '1.5px solid orange';
           tropSpan.style.padding = '6px 2px';
@@ -324,21 +390,15 @@ document.addEventListener('DOMContentLoaded', function() {
           syntaxSpan.style.padding = '2px';
           syntaxSpan.style.display = 'inline-block';
         }
-
-        observer.unobserve(container);
       }
     });
-  });
-
-  document.querySelectorAll('.table-container').forEach(container => {
-    observer.observe(container);
   });
 });
 
 function highlightRangeAcrossTables(container, startWord, endWord, color) {
   const tables = Array.from(container.querySelectorAll('.segment-table'));
   if (!tables.length) return;
-
+console.log('across tables');
   // Find the tables that contain the start and end words
   let startTable = null, endTable = null;
   let startCell = null, endCell = null;
@@ -446,21 +506,21 @@ function highlightCellRange(table, startRow = 1, startCol, endRow = 1, endCol, b
   const rowStarts = Array.from(table.rows).slice(startRow - 1, endRow);
   const firstCell = rowStarts[0] && rowStarts[0].cells[startCol - 1];
   const lastCell = rowStarts[rowStarts.length - 1] && rowStarts[rowStarts.length - 1].cells[endCol - 1];
-  
+
   if (!firstCell || !lastCell) return;
-  
+
   const firstRect = firstCell.getBoundingClientRect();
   const lastRect = lastCell.getBoundingClientRect();
-  
+
   const left = firstRect.left - rect.left - borderPx;
   const top = firstRect.top - rect.top - borderPx;
   const width = lastRect.right - firstRect.left + borderPx * 2;
   const height = lastRect.bottom - firstRect.top + borderPx * 2;
-  
+
   const highlight = document.createElement('div');
   highlight.className = 'cell-highlight cell-highlight-' + (color === 'orange' ? 'trop' : 'syntax') + ' ' + position;
   highlight.style.cssText = `position: absolute; top: ${top}px; left: ${left}px; width: ${width}px; height: ${height}px; border: ${borderThickPx}px solid ${color}; pointer-events: none; z-index: 100; box-sizing: border-box;`;
-  
+
   table.style.position = 'relative';
   table.style.overflow = 'visible';
   table.appendChild(highlight);
