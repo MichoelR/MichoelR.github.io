@@ -5,55 +5,56 @@ function highlightMismatch(element, type, chap, verse) {
   const words = element.getAttribute('data-words').split('-');
   const startWord = parseInt(words[0]);
   const endWord = parseInt(words[1]);
-  const tables = container.querySelectorAll('.segment-table');
-  tables.forEach(table => {
-    const cells = table.querySelectorAll('td[data-word]');
-    cells.forEach(cell => {
-      const wordNum = parseInt(cell.getAttribute('data-word'));
-      if (wordNum >= startWord && wordNum <= endWord) {
-        if (type === 'trop') {
-          cell.classList.add('highlight-trop');
-          cell.classList.remove('highlight-syntax');
-        } else {
-          cell.classList.add('highlight-syntax');
-          cell.classList.remove('highlight-trop');
-        }
-      } else {
-        cell.classList.remove('highlight-trop', 'highlight-syntax');
-      }
+  const tableContainer = container.querySelector('.table-container');
+  if (tableContainer) {
+    // Remove any existing temporary highlights
+    tableContainer.querySelectorAll('.temp-highlight-trop, .temp-highlight-syntax').forEach(cell => {
+      cell.classList.remove('temp-highlight-trop', 'temp-highlight-syntax');
     });
-  });
+    
+    // Apply temporary highlight for the hovered range
+    for (let w = startWord; w <= endWord; w++) {
+      const td = tableContainer.querySelector(`td[data-word="${w}"]`);
+      if (td) {
+        td.classList.add(type === 'trop' ? 'temp-highlight-trop' : 'temp-highlight-syntax');
+      }
+    }
+  }
 }
 
 function highlightWordRange(cell, chap, verse) {
   const container = document.querySelector(`.verse-container[data-chap="${chap}"][data-verse="${verse}"]`);
   if (!container) return;
   const selectedRadio = container.querySelector(`input[name="mismatch-select-${chap}-${verse}"]:checked`);
-  if (!selectedRadio) return;
-  const tropRange = selectedRadio.getAttribute('data-trop').split('-');
-  const syntaxRange = selectedRadio.getAttribute('data-syntax').split('-');
-  const startTrop = parseInt(tropRange[0]);
-  const endTrop = parseInt(tropRange[1]);
-  const startSyntax = parseInt(syntaxRange[0]);
-  const endSyntax = parseInt(syntaxRange[1]);
-  const tables = container.querySelectorAll('.segment-table');
-  tables.forEach(table => {
-    const cells = table.querySelectorAll('td[data-word]');
-    cells.forEach(c => {
-      c.classList.remove('highlight-trop', 'highlight-syntax'); // Ensure previous highlights are cleared
-      const wordNum = parseInt(c.getAttribute('data-word'));
-      if (wordNum >= startTrop && wordNum <= endTrop) {
-        c.classList.add('highlight-trop');
-      } else {
-        c.classList.remove('highlight-trop');
-      }
-      if (wordNum >= startSyntax && wordNum <= endSyntax) {
-        c.classList.add('highlight-syntax');
-      } else {
-        c.classList.remove('highlight-syntax');
-      }
-    });
-  });
+  if (!selectedRadio) {
+    // Handle single mismatch case where there is no radio button
+    const mismatchDiv = container.querySelector('.mismatch-selector .mismatch-data');
+    if (!mismatchDiv) return;
+    const tropSpan = mismatchDiv.querySelector('.verse-trop');
+    const syntaxSpan = mismatchDiv.querySelector('.verse-syntax');
+    if (!tropSpan || !syntaxSpan) return;
+    const tropRange = tropSpan.getAttribute('data-words').split('-').map(Number);
+    const syntaxRange = syntaxSpan.getAttribute('data-words').split('-').map(Number);
+    applyHighlights(container, tropRange[0], tropRange[1], syntaxRange[0], syntaxRange[1]);
+  } else {
+    const tropRange = selectedRadio.getAttribute('data-trop').split('-').map(Number);
+    const syntaxRange = selectedRadio.getAttribute('data-syntax').split('-').map(Number);
+    applyHighlights(container, tropRange[0], tropRange[1], syntaxRange[0], syntaxRange[1]);
+  }
+}
+
+function applyHighlights(container, startTrop, endTrop, startSyntax, endSyntax) {
+  const tableContainer = container.querySelector('.table-container');
+  if (!tableContainer) return;
+  
+  // Remove existing highlights
+  tableContainer.querySelectorAll('.cell-highlight-trop, .cell-highlight-syntax').forEach(h => h.remove());
+  
+  // Highlight trope range across all relevant tables
+  highlightRangeAcrossTables(tableContainer, startTrop, endTrop, 'orange');
+  
+  // Highlight syntax range across all relevant tables
+  highlightRangeAcrossTables(tableContainer, startSyntax, endSyntax, 'blue');
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -65,17 +66,37 @@ document.addEventListener('DOMContentLoaded', function() {
       const chapVerse = name.split('mismatch-select-')[1].split('-');
       const chap = chapVerse[0];
       const verse = chapVerse[1];
-      // Clear all existing highlights for this verse before applying new ones
+      highlightWordRange(null, chap, verse);
+      
+      // Update borders on mismatch spans
       const container = document.querySelector(`.verse-container[data-chap="${chap}"][data-verse="${verse}"]`);
       if (container) {
-        const cells = container.querySelectorAll('td[data-word]');
-        cells.forEach(cell => {
-          cell.classList.remove('highlight-trop', 'highlight-syntax');
+        const mismatchDivs = container.querySelectorAll('.mismatch-data');
+        mismatchDivs.forEach(div => {
+          const tropSpan = div.querySelector('.verse-trop');
+          const syntaxSpan = div.querySelector('.verse-syntax');
+          if (tropSpan) tropSpan.style.border = '';
+          if (syntaxSpan) syntaxSpan.style.border = '';
         });
+        const selectedMismatchDiv = container.querySelector(`.mismatch-data.mismatch-${radio.value}`);
+        if (selectedMismatchDiv) {
+          const tropSpan = selectedMismatchDiv.querySelector('.verse-trop');
+          const syntaxSpan = selectedMismatchDiv.querySelector('.verse-syntax');
+          if (tropSpan) {
+            tropSpan.style.border = '1.5px solid orange';
+            tropSpan.style.padding = '6px 2px';
+            tropSpan.style.display = 'inline-block';
+          }
+          if (syntaxSpan) {
+            syntaxSpan.style.border = '1.5px solid blue';
+            syntaxSpan.style.padding = '2px';
+            syntaxSpan.style.display = 'inline-block';
+          }
+        }
       }
-      highlightWordRange(null, chap, verse);
     });
   });
+  
   // Trigger highlighting for all verses with mismatches on page load
   const containers = document.querySelectorAll('.verse-container');
   containers.forEach(container => {
@@ -84,6 +105,30 @@ document.addEventListener('DOMContentLoaded', function() {
     const radio = container.querySelector(`input[type="radio"][name="mismatch-select-${chap}-${verse}"]:checked`);
     if (radio) {
       highlightWordRange(null, chap, verse);
+    } else if (container.querySelector('.mismatch-selector .mismatch-data')) {
+      highlightWordRange(null, chap, verse);
     }
+  });
+  
+  // Add hover effects for verse-trop and verse-syntax spans
+  document.querySelectorAll('.verse-trop, .verse-syntax').forEach(span => {
+    span.addEventListener('mouseover', function() {
+      const mismatchDiv = this.closest('.mismatch-data');
+      if (!mismatchDiv) return;
+      const chap = mismatchDiv.closest('.verse-container').getAttribute('data-chap');
+      const verse = mismatchDiv.closest('.verse-container').getAttribute('data-verse');
+      highlightMismatch(this, this.classList.contains('verse-trop') ? 'trop' : 'syntax', chap, verse);
+    });
+    
+    span.addEventListener('mouseout', function() {
+      const mismatchDiv = this.closest('.mismatch-data');
+      if (!mismatchDiv) return;
+      const tableContainer = mismatchDiv.closest('.verse-container').querySelector('.table-container');
+      if (tableContainer) {
+        tableContainer.querySelectorAll('.temp-highlight-trop, .temp-highlight-syntax').forEach(cell => {
+          cell.classList.remove('temp-highlight-trop', 'temp-highlight-syntax');
+        });
+      }
+    });
   });
 });

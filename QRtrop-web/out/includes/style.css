@@ -28,6 +28,8 @@ tr:nth-child(2) .verse-trop { display: inline-block; height: 100%; padding: 5px 
 .highlight-trop-bright.highlight-syntax-bright { background-color: #dda0dd; border: 1px solid black; opacity: 0.7; }
 .highlight-pair-trop { background-color: gold !important; color: black; }
 .highlight-pair-syntax { background-color: lightblue !important; color: black; }
+.temp-highlight-trop { background-color: rgba(255, 215, 0, 0.3); border: 1px dashed orange; }
+.temp-highlight-syntax { background-color: rgba(173, 216, 230, 0.3); border: 1px dashed blue; }
 
 
 
