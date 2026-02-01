@@ -1,143 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-  document.querySelectorAll('.branch-end, .branch-start').forEach(span => {
-    span.addEventListener('mouseover', function() {
-      const id = this.id;
-      if (!id) return;
-      const parts = id.split('-');
-      const start = parseInt(parts[5]);
-      const end = parseInt(parts[6]);
-      const isTrope = id.startsWith('trop-');
-      const container = span.closest('.table-container');
-      if (container) {
-        for (let w = start; w <= end; w++) {
-          const td = container.querySelector(`td[data-word="${w}"]`);
-          if (td) {
-            td.classList.add(isTrope ? 'highlight-trop-bright' : 'highlight-syntax-bright');
-          }
-        }
-        // Highlight matching bracket
-        const dirIndex = parts.length - 1; // Last part is always the direction
-        const direction = parts[dirIndex];
-        const pairDirection = direction === 'L' ? 'R' : 'L';
-        const pairParts = [...parts];
-        pairParts[dirIndex] = pairDirection;
-        const pairId = pairParts.join('-');
-        // Search for the pair within the same container
-        const pairSpan = container.querySelector(`[id="${pairId}"]`);
-        if (pairSpan) {
-          pairSpan.classList.add('highlight-pair');
-        }
-        span.classList.add('highlight-pair');
-        // Highlight associated trop text
-        let tropSpan = null;
-        if (isTrope) {
-          // For trope, highlight the mafsik: the trop in the td of the left paren
-          let leftParen;
-          if (parts[dirIndex] === 'L') {
-            leftParen = span; // this is the left paren
-          } else {
-            // find the paired left paren within the same container
-            const pairDirection = 'L';
-            const pairParts = [...parts];
-            pairParts[dirIndex] = pairDirection;
-            const pairId = pairParts.join('-');
-            leftParen = container.querySelector(`[id="${pairId}"]`);
-          }
-          if (leftParen) {
-            const td = leftParen.closest('td');
-            tropSpan = td ? td.querySelector('.verse-trop') : null;
-          }
-        } else {
-          const td = span.closest('td');
-          tropSpan = td ? td.querySelector('.verse-trop') : null;
-        }
-        if (tropSpan) {
-          tropSpan.classList.add('highlight-pair');
-        }
-        // Handle overlaps
-        const overlappingWords = new Set();
-        container.querySelectorAll('.highlight-trop-bright.highlight-syntax-bright').forEach(td => {
-          overlappingWords.add(td.dataset.word);
-        });
-        overlappingWords.forEach(word => {
-          const td = container.querySelector('td[data-word="' + word + '"]');
-          if (td) {
-            td.classList.remove('highlight-trop-bright', 'highlight-syntax-bright');
-            td.classList.add('highlight-overlap');
-          }
-        });
-      }
-    });
-    span.addEventListener('mouseout', function(e) {
-      const id = this.id;
-      if (!id) return;
-      const parts = id.split('-');
-      const start = parseInt(parts[5]);
-      const end = parseInt(parts[6]);
-      const isTrope = id.startsWith('trop-');
-      const container = span.closest('.table-container');
-      if (container) {
-        // Check if moving to a related element (other paren, mafsik, or a cell in the range)
-        const relatedTarget = e.relatedTarget;
-        if (relatedTarget && (
-            (relatedTarget.classList && (
-                (relatedTarget.classList.contains('branch-end') || relatedTarget.classList.contains('branch-start')) && relatedTarget.id.includes(parts[0] + '-' + parts[1] + '-' + parts[2])
-            )) ||
-            (relatedTarget.classList && relatedTarget.classList.contains('verse-trop') && relatedTarget.closest('td') === this.closest('td')) ||
-            (relatedTarget.tagName === 'TD' && relatedTarget.dataset.word && parseInt(relatedTarget.dataset.word) >= start && parseInt(relatedTarget.dataset.word) <= end)
-        )) {
-          console.log('Moving to related element, not clearing highlight from paren');
-          return;
-        }
-        for (let w = start; w <= end; w++) {
-          const td = container.querySelector(`td[data-word="${w}"]`);
-          if (td) {
-            td.classList.remove(isTrope ? 'highlight-trop-bright' : 'highlight-syntax-bright', 'highlight-overlap');
-          }
-        }
-        // Remove highlight from matching bracket
-        const dirIndex = parts.length - 1; // Last part is always the direction
-        const direction = parts[dirIndex];
-        const pairDirection = direction === 'L' ? 'R' : 'L';
-        const pairParts = [...parts];
-        pairParts[dirIndex] = pairDirection;
-        const pairId = pairParts.join('-');
-        // Search for the pair within the same container
-        const pairSpan = container.querySelector(`[id="${pairId}"]`);
-        if (pairSpan) {
-          pairSpan.classList.remove('highlight-pair');
-        }
-        span.classList.remove('highlight-pair');
-        // Remove highlight from associated trop text
-        let tropSpan = null;
-        if (isTrope) {
-          // For trope, the mafsik: the trop in the td of the left paren
-          let leftParen;
-          if (parts[dirIndex] === 'L') {
-            leftParen = span; // this is the left paren
-          } else {
-            // find the paired left paren within the same container
-            const pairDirection = 'L';
-            const pairParts = [...parts];
-            pairParts[dirIndex] = pairDirection;
-            const pairId = pairParts.join('-');
-            leftParen = container.querySelector(`[id="${pairId}"]`);
-          }
-          if (leftParen) {
-            const td = leftParen.closest('td');
-            tropSpan = td ? td.querySelector('.verse-trop') : null;
-          }
-        } else {
-          const td = span.closest('td');
-          tropSpan = td ? td.querySelector('.verse-trop') : null;
-        }
-        if (tropSpan) {
-          tropSpan.classList.remove('highlight-pair');
-        }
-      }
-    });
-  });
-
   document.querySelectorAll('.verse-trop, .verse-syntax').forEach(span => {
     span.addEventListener('mouseover', function() {
       const mismatchDiv = this.closest('.mismatch-data');
@@ -211,145 +72,76 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
-// Add listeners for mafsik (last trop in trope row)
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('Initializing mafsik hover listeners...');
-  const mafsikSpans = document.querySelectorAll('.segment-table tr:nth-child(2) td span.verse-trop');
-  console.log('Found mafsik spans:', mafsikSpans.length);
-  mafsikSpans.forEach(span => {
-    // Check if it's a mafsik by looking for a branch-end span within the same td or adjacent elements
-    const td = span.closest('td');
-    if (!td) {
-      console.log('No parent td found for span:', span.textContent);
-      return;
-    }
-    const branchEnd = td.querySelector('.branch-end');
-    if (!branchEnd) {
-      console.log('Skipping non-mafsik span (no branch-end found):', span.textContent);
-      return;
-    }
-    console.log('Adding hover listener to mafsik:', span.textContent);
-    span.style.cursor = 'pointer'; // Ensure cursor changes to pointer to indicate interactivity
-    span.style.zIndex = '10'; // Ensure it's above other elements
-    span.addEventListener('mouseenter', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      console.log('Hovering over mafsik:', this.textContent);
-      const container = this.closest('.table-container');
-      if (!container) {
-        console.log('No container found for mafsik:', this.textContent);
-        return;
-      }
-      // Get left paren (branch-end)
-      const leftParen = td.querySelector('.branch-end');
-      if (!leftParen) {
-        console.log('No valid left paren found for mafsik:', this.textContent);
-        return;
-      }
-      // Parse left paren's id for start, end
-      const id = leftParen.id;
-      if (!id) {
-        console.log('No ID found on left paren for mafsik:', this.textContent);
-        return;
-      }
-      const parts = id.split('-');
-      const start = parseInt(parts[5]);
-      const end = parseInt(parts[6]);
-      const isTrope = id.startsWith('trop-');
-      console.log('Highlighting range:', start, 'to', end);
-      // Highlight word range
-      for (let w = start; w <= end; w++) {
-        const td = container.querySelector(`td[data-word="${w}"]`);
-        if (td) {
-          td.classList.add(isTrope ? 'highlight-trop-bright' : 'highlight-syntax-bright');
-        } else {
-          console.log('No cell found for word:', w);
-        }
-      }
-      // Highlight mafsik
-      this.classList.add('highlight-pair');
-      // Highlight left paren
-      leftParen.classList.add('highlight-pair');
-      // Highlight right paren (paired)
-      const dirIndex = parts.length - 1; // Last part is always the direction
-      const direction = parts[dirIndex];
-      const pairDirection = direction === 'L' ? 'R' : 'L';
-      const pairParts = [...parts];
-      pairParts[dirIndex] = pairDirection;
-      const pairId = pairParts.join('-');
-      // Search for the pair within the same container
-      const rightParen = container.querySelector(`[id="${pairId}"]`);
-      if (rightParen) {
-        rightParen.classList.add('highlight-pair');
-      } else {
-        console.log('No right paren found with ID:', pairId);
-      }
-      // Handle overlaps
-      const overlappingWords = new Set();
-      container.querySelectorAll('.highlight-trop-bright.highlight-syntax-bright').forEach(td => {
-        overlappingWords.add(td.dataset.word);
-      });
-      overlappingWords.forEach(word => {
-        const td = container.querySelector('td[data-word="' + word + '"]');
-        if (td) {
-          td.classList.remove('highlight-trop-bright', 'highlight-syntax-bright');
-          td.classList.add('highlight-overlap');
-        }
-      });
-    });
-    span.addEventListener('mouseleave', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      console.log('Mouse out from mafsik:', this.textContent);
-      const container = this.closest('.table-container');
-      if (!container) return;
-      // Get left paren
-      const leftParen = td.querySelector('.branch-end');
-      if (!leftParen) return;
-      // Parse left paren's id for start, end
-      const id = leftParen.id;
+  document.querySelectorAll('.branch-end, .branch-start').forEach(span => {
+    span.addEventListener('mouseenter', function() {
+      const id = this.id;
       if (!id) return;
       const parts = id.split('-');
-      const start = parseInt(parts[5]);
-      const end = parseInt(parts[6]);
-      const isTrope = id.startsWith('trop-');
-      // Check if moving to a related element (left paren, right paren, or another part of the range)
-      const relatedTarget = e.relatedTarget;
-      if (relatedTarget && (
-          relatedTarget === leftParen ||
-          (relatedTarget.classList && relatedTarget.classList.contains('branch-start') && relatedTarget.id.includes(parts[0] + '-' + parts[1] + '-' + parts[2])) ||
-          (relatedTarget.tagName === 'TD' && relatedTarget.dataset.word && parseInt(relatedTarget.dataset.word) >= start && parseInt(relatedTarget.dataset.word) <= end)
-      )) {
-        console.log('Moving to related element, not clearing highlight');
-        return;
-      }
-      // Remove word highlights
-      for (let w = start; w <= end; w++) {
-        const td = container.querySelector(`td[data-word="${w}"]`);
-        if (td) {
-          td.classList.remove(isTrope ? 'highlight-trop-bright' : 'highlight-syntax-bright', 'highlight-overlap');
-        }
-      }
-      // Remove mafsik highlight
-      this.classList.remove('highlight-pair');
-      // Remove left paren highlight
-      leftParen.classList.remove('highlight-pair');
-      // Remove right paren highlight
-      const dirIndex = parts.length - 1; // Last part is always the direction
-      const direction = parts[dirIndex];
-      const pairDirection = direction === 'L' ? 'R' : 'L';
-      const pairParts = [...parts];
-      pairParts[dirIndex] = pairDirection;
-      const pairId = pairParts.join('-');
-      // Search for the pair within the same container
-      const rightParen = container.querySelector(`[id="${pairId}"]`);
-      if (rightParen) {
-        rightParen.classList.remove('highlight-pair');
-      }
+      const prefix = parts.slice(0, -1).join('-');
+      const container = span.closest('.table-container');
+
+      // Step 1: Clear ALL existing highlights in this table (so only one triplet shows)
+      clearAllGroups(container);
+
+      // Step 2: Highlight only this triplet
+      highlightGroup(prefix, container, id.includes('syntax') ? 'syntax' : 'trop');
+    });
+
+    span.addEventListener('mouseleave', function(e) {
+      const related = e.relatedTarget;
+      if (related && span.closest('.table-container').contains(related)) return;
+
+      const id = this.id;
+      if (!id) return;
+      const parts = id.split('-');
+      const prefix = parts.slice(0, -1).join('-');
+      const container = span.closest('.table-container');
+
+      // Clear only this group (but since we clear all on enter, it's safe)
+      clearGroup(prefix, container);
     });
   });
 });
 
+function highlightGroup(prefix, container, type) {
+  const leftParen = container.querySelector(`[id="${prefix}-L"]`);
+  if (!leftParen) return;
+
+  const parts = leftParen.id.split('-');
+  const start = parseInt(parts[5]);
+  const end = parseInt(parts[6]);
+
+  // Highlight word cells for this triplet only
+  for (let w = start; w <= end; w++) {
+    const cell = container.querySelector(`td[data-word="${w}"]`);
+    if (cell) {
+      cell.classList.add(type === 'syntax' ? 'highlight-syntax-bright' : 'highlight-trop-bright');
+    }
+  }
+
+  // Highlight the parens and text for this triplet only
+  container.querySelectorAll(`[id^="${prefix}"]`).forEach(el => {
+    el.classList.add('highlight-pair');
+  });
+}
+
+function clearGroup(prefix, container) {
+  container.querySelectorAll('.highlight-trop-bright, .highlight-syntax-bright').forEach(el => {
+    el.classList.remove('highlight-trop-bright', 'highlight-syntax-bright');
+  });
+  container.querySelectorAll(`[id^="${prefix}"]`).forEach(el => {
+    el.classList.remove('highlight-pair');
+  });
+}
+
+function clearAllGroups(container) {
+  container.querySelectorAll('.highlight-trop-bright, .highlight-syntax-bright, .highlight-pair').forEach(el => {
+    el.classList.remove('highlight-trop-bright', 'highlight-syntax-bright', 'highlight-pair');
+  });
+}
+
+// Build mismatch colored boxes as they appear on the page
 document.addEventListener('DOMContentLoaded', function() {
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
@@ -455,7 +247,6 @@ document.addEventListener('DOMContentLoaded', function() {
 function highlightRangeAcrossTables(container, startWord, endWord, color) {
   const tables = Array.from(container.querySelectorAll('.segment-table'));
   if (!tables.length) return;
-console.log('across tables');
   // Find the tables that contain the start and end words
   let startTable = null, endTable = null;
   let startCell = null, endCell = null;

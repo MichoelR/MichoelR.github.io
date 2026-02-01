@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function() {
       highlightMismatch(this, this.classList.contains('verse-trop') ? 'trop' : 'syntax', chap, verse);
     });
     
-    span.addEventListener('mouseout', function() {
+    span.addEventListener('paren', function() {
       const mismatchDiv = this.closest('.mismatch-data');
       if (!mismatchDiv) return;
       const tableContainer = mismatchDiv.closest('.verse-container').querySelector('.table-container');
