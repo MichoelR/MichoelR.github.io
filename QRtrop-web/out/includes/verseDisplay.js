@@ -277,165 +277,178 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
   
-  // Add hover effects for verse-trop and verse-syntax spans
-  document.querySelectorAll('.verse-trop, .verse-syntax').forEach(span => {
-    span.addEventListener('mouseover', function() {
-      const mismatchDiv = this.closest('.mismatch-data');
-      if (!mismatchDiv) return;
-      const chap = mismatchDiv.closest('.verse-container').getAttribute('data-chap');
-      const verse = mismatchDiv.closest('.verse-container').getAttribute('data-verse');
-      highlightMismatch(this, this.classList.contains('verse-trop') ? 'trop' : 'syntax', chap, verse);
-      
-      // Additional hover logic for mismatch spans
-      const tropSpan = mismatchDiv.querySelector('.verse-trop');
-      const syntaxSpan = mismatchDiv.querySelector('.verse-syntax');
-      if (!tropSpan || !syntaxSpan) return;
-      const [tropStart, tropEnd] = tropSpan.dataset.words.split('-').map(Number);
-      const [syntaxStart, syntaxEnd] = syntaxSpan.dataset.words.split('-').map(Number);
-      const container = mismatchDiv.closest('.verse-container').querySelector('.table-container');
-      if (container) {
-        if (!this.closest('td')) {
-          // Compute overlap words
-          const overlapWords = new Set();
-          for (let w = Math.max(tropStart, syntaxStart); w <= Math.min(tropEnd, syntaxEnd); w++) {
-            overlapWords.add(w);
-          }
-          if (this.classList.contains('verse-trop')) {
-            // Hovering over trop words: highlight trop-only gold, overlap violet
-            for (let w = tropStart; w <= tropEnd; w++) {
-              const td = container.querySelector(`td[data-word="${w}"]`);
-              if (td) {
-                if (overlapWords.has(w)) {
-                  td.classList.add('highlight-overlap');
-                } else {
-                  td.classList.add('highlight-trop-bright');
-                }
-              }
-            }
-          } else if (this.classList.contains('verse-syntax')) {
-            // Hovering over syntax words: highlight syntax-only lightblue, overlap violet
-            for (let w = syntaxStart; w <= syntaxEnd; w++) {
-              const td = container.querySelector(`td[data-word="${w}"]`);
-              if (td) {
-                if (overlapWords.has(w)) {
-                  td.classList.add('highlight-overlap');
-                } else {
-                  td.classList.add('highlight-syntax-bright');
-                }
-              }
-            }
-          }
-        }
-      }
-    });
-    
-    span.addEventListener('mouseout', function() {
-      const mismatchDiv = this.closest('.mismatch-data');
-      if (!mismatchDiv) return;
-      const tableContainer = mismatchDiv.closest('.verse-container').querySelector('.table-container');
-      if (tableContainer) {
-        tableContainer.querySelectorAll('.temp-highlight-trop, .temp-highlight-syntax').forEach(cell => {
-          cell.classList.remove('temp-highlight-trop', 'temp-highlight-syntax');
-        });
-      }
-      
-      // Additionalmouseout logic for mismatch spans
-      const tropSpan = mismatchDiv.querySelector('.verse-trop');
-      const syntaxSpan = mismatchDiv.querySelector('.verse-syntax');
-      if (!tropSpan || !syntaxSpan) return;
-      const [tropStart, tropEnd] = tropSpan.dataset.words.split('-').map(Number);
-      const [syntaxStart, syntaxEnd] = syntaxSpan.dataset.words.split('-').map(Number);
-      const container = mismatchDiv.closest('.verse-container').querySelector('.table-container');
-      if (container) {
-        // Remove all highlights
-        for (let w = Math.min(tropStart, syntaxStart); w <= Math.max(tropEnd, syntaxEnd); w++) {
-          const td = container.querySelector(`td[data-word="${w}"]`);
-          if (td) {
-            td.classList.remove('highlight-overlap', 'highlight-trop-bright', 'highlight-syntax-bright');
-          }
-        }
-      }
-    });
-  });
+// Add hover effects for verse-trop and verse-syntax spans
+document.querySelectorAll('.verse-trop, .verse-syntax').forEach(span => {
+span.addEventListener('mouseover', function() {
+  const mismatchDiv = this.closest('.mismatch-data');
+  if (!mismatchDiv) return;
+  const chap = mismatchDiv.closest('.verse-container').getAttribute('data-chap');
+  const verse = mismatchDiv.closest('.verse-container').getAttribute('data-verse');
+  highlightMismatch(this, this.classList.contains('verse-trop') ? 'trop' : 'syntax', chap, verse);
   
-  // Add hover effects for branch-end and branch-start spans
-  document.querySelectorAll('.branch-end, .branch-start').forEach(span => {
-    span.addEventListener('mouseenter', function() {
-      const id = this.id;
-      if (!id) return;
-      const parts = id.split('-');
-      const prefix = parts.slice(0, -1).join('-');
-      const container = span.closest('.table-container');
+  // Additional hover logic for mismatch spans
+  const tropSpan = mismatchDiv.querySelector('.verse-trop');
+  const syntaxSpan = mismatchDiv.querySelector('.verse-syntax');
+  if (!tropSpan || !syntaxSpan) return;
+  const [tropStart, tropEnd] = tropSpan.dataset.words.split('-').map(Number);
+  const [syntaxStart, syntaxEnd] = syntaxSpan.dataset.words.split('-').map(Number);
+  const container = mismatchDiv.closest('.verse-container').querySelector('.table-container');
+  if (container) {
+	if (!this.closest('td')) {
+	  // Compute overlap words
+	  const overlapWords = new Set();
+	  for (let w = Math.max(tropStart, syntaxStart); w <= Math.min(tropEnd, syntaxEnd); w++) {
+		overlapWords.add(w);
+	  }
+	  if (this.classList.contains('verse-trop')) {
+		// Hovering over trop words: highlight trop-only gold, overlap violet
+		for (let w = tropStart; w <= tropEnd; w++) {
+		  const td = container.querySelector(`td[data-word="${w}"]`);
+		  if (td) {
+			if (overlapWords.has(w)) {
+			  td.classList.add('highlight-overlap');
+			} else {
+			  td.classList.add('highlight-trop-bright');
+			}
+		  }
+		}
+	  } else if (this.classList.contains('verse-syntax')) {
+		// Hovering over syntax words: highlight syntax-only lightblue, overlap violet
+		for (let w = syntaxStart; w <= syntaxEnd; w++) {
+		  const td = container.querySelector(`td[data-word="${w}"]`);
+		  if (td) {
+			if (overlapWords.has(w)) {
+			  td.classList.add('highlight-overlap');
+			} else {
+			  td.classList.add('highlight-syntax-bright');
+			}
+		  }
+		}
+	  }
+	}
+  }
+});
 
-      // Step 1: Clear ALL existing highlights in this table (so only one triplet shows)
-      clearAllGroups(container);
-
-      // Step 2: Highlight only this triplet
-      highlightGroup(prefix, container, id.includes('syntax') ? 'syntax' : 'trop');
-    });
-
-    span.addEventListener('mouseleave', function(e) {
-      const related = e.relatedTarget;
-      if (related && span.closest('.table-container').contains(related)) return;
-
-      const id = this.id;
-      if (!id) return;
-      const parts = id.split('-');
-      const prefix = parts.slice(0, -1).join('-');
-      const container = span.closest('.table-container');
-
-      // Clear only this group (but since we clear all on enter, it's safe)
-      clearGroup(prefix, container);
-    });
-  });
+span.addEventListener('mouseout', function() {
+  const mismatchDiv = this.closest('.mismatch-data');
+  if (!mismatchDiv) return;
+  const tableContainer = mismatchDiv.closest('.verse-container').querySelector('.table-container');
+  if (tableContainer) {
+	tableContainer.querySelectorAll('.temp-highlight-trop, .temp-highlight-syntax').forEach(cell => {
+	  cell.classList.remove('temp-highlight-trop', 'temp-highlight-syntax');
+	});
+  }
   
-  // Build mismatch colored boxes as they appear on the page
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const container = entry.target;
-        const verseContainer = container.closest('.verse-container');
-        if (!verseContainer) return;
-        const chap = verseContainer.getAttribute('data-chap');
-        const verse = verseContainer.getAttribute('data-verse');
-        let tropRange, syntaxRange;
-        const selectedRadio = verseContainer.querySelector(`input[name="mismatch-select-${chap}-${verse}"]:checked`);
-        if (selectedRadio) {
-          tropRange = selectedRadio.getAttribute('data-trop').split('-').map(Number);
-          syntaxRange = selectedRadio.getAttribute('data-syntax').split('-').map(Number);
-        } else {
-          // Handle single mismatch case where there is no radio button
-          const mismatchDiv = verseContainer.querySelector('.mismatch-selector .mismatch-data');
-          if (!mismatchDiv) return;
-          const tropSpan = mismatchDiv.querySelector('.verse-trop');
-          const syntaxSpan = mismatchDiv.querySelector('.verse-syntax');
-          if (!tropSpan || !syntaxSpan) return;
-          tropRange = tropSpan.getAttribute('data-words').split('-').map(Number);
-          syntaxRange = syntaxSpan.getAttribute('data-words').split('-').map(Number);
-          // Add colored borders to mismatch-data spans
-          tropSpan.style.border = '1.5px solid orange';
-          tropSpan.style.padding = '6px 2px';
-          tropSpan.style.display = 'inline-block';
-          syntaxSpan.style.border = '1.5px solid blue';
-          syntaxSpan.style.padding = '2px';
-          syntaxSpan.style.display = 'inline-block';
-        }
+  // Additionalmouseout logic for mismatch spans
+  const tropSpan = mismatchDiv.querySelector('.verse-trop');
+  const syntaxSpan = mismatchDiv.querySelector('.verse-syntax');
+  if (!tropSpan || !syntaxSpan) return;
+  const [tropStart, tropEnd] = tropSpan.dataset.words.split('-').map(Number);
+  const [syntaxStart, syntaxEnd] = syntaxSpan.dataset.words.split('-').map(Number);
+  const container = mismatchDiv.closest('.verse-container').querySelector('.table-container');
+  if (container) {
+	// Remove all highlights
+	for (let w = Math.min(tropStart, syntaxStart); w <= Math.max(tropEnd, syntaxEnd); w++) {
+	  const td = container.querySelector(`td[data-word="${w}"]`);
+	  if (td) {
+		td.classList.remove('highlight-overlap', 'highlight-trop-bright', 'highlight-syntax-bright');
+	  }
+	}
+  }
+});
+});
+  
+// Add hover effects for branch-end and branch-start spans
+document.querySelectorAll('.branch-end, .branch-start').forEach(span => {
+span.addEventListener('mouseenter', function() {
+  const id = this.id;
+  if (!id) return;
+  const parts = id.split('-');
+  const prefix = parts.slice(0, -1).join('-');
+  const container = span.closest('.table-container');
 
-        // Remove any existing highlights in the container to prevent duplicates
-        container.querySelectorAll('.cell-highlight-trop, .cell-highlight-syntax').forEach(h => h.remove());
+  // Step 1: Clear ALL existing highlights in this table (so only one triplet shows)
+  clearAllGroups(container);
 
-        // Highlight trope range across all relevant tables
-        highlightRangeAcrossTables(container, tropRange[0], tropRange[1], 'orange');
+  // Step 2: Highlight only this triplet
+  highlightGroup(prefix, container, id.includes('syntax') ? 'syntax' : 'trop');
+});
 
-        // Highlight syntax range across all relevant tables
-        highlightRangeAcrossTables(container, syntaxRange[0], syntaxRange[1], 'blue');
+span.addEventListener('mouseleave', function(e) {
+  const related = e.relatedTarget;
+  if (related && span.closest('.table-container').contains(related)) return;
 
-        observer.unobserve(container);
-      }
-    });
+  const id = this.id;
+  if (!id) return;
+  const parts = id.split('-');
+  const prefix = parts.slice(0, -1).join('-');
+  const container = span.closest('.table-container');
+
+  // Clear only this group (but since we clear all on enter, it's safe)
+  clearGroup(prefix, container);
+});
+});
+  
+  // Add global clear when leaving the entire row/table
+document.querySelectorAll('.segment-table').forEach(table => {
+  table.addEventListener('mouseleave', function(e) {
+    // Only clear if mouse is truly outside this table
+    if (!table.contains(e.relatedTarget)) {
+      console.log('Mouse left table – clearing all highlights');
+      table.querySelectorAll('.highlight-trop-bright, .highlight-syntax-bright, .highlight-pair').forEach(el => {
+        el.classList.remove('highlight-trop-bright', 'highlight-syntax-bright', 'highlight-pair');
+      });
+    }
   });
+});
+  
+// Build mismatch colored boxes as they appear on the page
+const observer = new IntersectionObserver((entries) => {
+entries.forEach(entry => {
+  if (entry.isIntersecting) {
+	const container = entry.target;
+	const verseContainer = container.closest('.verse-container');
+	if (!verseContainer) return;
+	const chap = verseContainer.getAttribute('data-chap');
+	const verse = verseContainer.getAttribute('data-verse');
+	let tropRange, syntaxRange;
+	const selectedRadio = verseContainer.querySelector(`input[name="mismatch-select-${chap}-${verse}"]:checked`);
+	if (selectedRadio) {
+	  tropRange = selectedRadio.getAttribute('data-trop').split('-').map(Number);
+	  syntaxRange = selectedRadio.getAttribute('data-syntax').split('-').map(Number);
+	} else {
+	  // Handle single mismatch case where there is no radio button
+	  const mismatchDiv = verseContainer.querySelector('.mismatch-selector .mismatch-data');
+	  if (!mismatchDiv) return;
+	  const tropSpan = mismatchDiv.querySelector('.verse-trop');
+	  const syntaxSpan = mismatchDiv.querySelector('.verse-syntax');
+	  if (!tropSpan || !syntaxSpan) return;
+	  tropRange = tropSpan.getAttribute('data-words').split('-').map(Number);
+	  syntaxRange = syntaxSpan.getAttribute('data-words').split('-').map(Number);
+	  // Add colored borders to mismatch-data spans
+	  tropSpan.style.border = '1.5px solid orange';
+	  tropSpan.style.padding = '6px 2px';
+	  tropSpan.style.display = 'inline-block';
+	  syntaxSpan.style.border = '1.5px solid blue';
+	  syntaxSpan.style.padding = '2px';
+	  syntaxSpan.style.display = 'inline-block';
+	}
 
-  document.querySelectorAll('.table-container').forEach(container => {
+	// Remove any existing highlights in the container to prevent duplicates
+	container.querySelectorAll('.cell-highlight-trop, .cell-highlight-syntax').forEach(h => h.remove());
+
+	// Highlight trope range across all relevant tables
+	highlightRangeAcrossTables(container, tropRange[0], tropRange[1], 'orange');
+
+	// Highlight syntax range across all relevant tables
+	highlightRangeAcrossTables(container, syntaxRange[0], syntaxRange[1], 'blue');
+
+	observer.unobserve(container);
+  }
+});
+});
+
+document.querySelectorAll('.table-container').forEach(container => {
     observer.observe(container);
-  });
+});
 });
